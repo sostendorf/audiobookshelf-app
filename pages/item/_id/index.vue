@@ -45,7 +45,7 @@
 
         <!-- cover + stats -->
         <div class="flex items-start">
-          <div class="w-5/12 flex-shrink-0 pr-3">
+          <div class="w-1/2 flex-shrink-0 pr-2">
             <div class="relative rounded-md overflow-hidden" @click="showFullscreenCover = true">
               <covers-book-cover :library-item="libraryItem" :width="coverWidth" :book-cover-aspect-ratio="bookCoverAspectRatio" raw @imageLoaded="coverImageLoaded" />
               <div v-if="!isPodcast && progressPercent > 0" class="absolute bottom-0 left-0 h-1 z-10 box-shadow-progressbar" :class="userIsFinished ? 'bg-success' : 'bg-yellow-400'" :style="{ width: progressPercent * 100 + '%' }" />
@@ -75,20 +75,20 @@
           </div>
 
           <!-- stat cards -->
-          <div class="flex-grow flex flex-col items-center">
-            <div v-if="!isPodcast && progressPercent > 0" class="bg-primary/60 rounded-md px-3 py-2 mb-2 text-center" style="width: max-content; max-width: 100%">
+          <div class="w-1/2 flex-shrink-0 pl-2">
+            <div v-if="!isPodcast && progressPercent > 0" class="bg-primary/60 rounded-md px-3 py-2 mb-2 text-center">
               <p class="text-fg-muted text-xs uppercase tracking-wide">{{ $strings.LabelYourProgress }}</p>
               <p class="text-lg font-semibold leading-tight">{{ Math.round(progressPercent * 100) }}%</p>
               <p v-if="!useEBookProgress && !userIsFinished" class="text-fg-muted text-xs">{{ $getString('LabelTimeRemaining', [$elapsedPretty(userTimeRemaining)]) }}</p>
               <p v-else-if="userIsFinished" class="text-fg-muted text-xs">{{ $strings.LabelFinished }} {{ $formatDate(userProgressFinishedAt) }}</p>
             </div>
 
-            <div v-if="numTracks" class="bg-primary/60 rounded-md px-3 py-2 mb-2 text-center" style="width: max-content; max-width: 100%">
+            <div v-if="numTracks" class="bg-primary/60 rounded-md px-3 py-2 mb-2 text-center">
               <p class="text-fg-muted text-xs uppercase tracking-wide">{{ $strings.LabelDuration }}</p>
               <p class="text-base font-semibold leading-tight">{{ $elapsedPretty(duration) }}</p>
             </div>
 
-            <div v-if="narrators?.length" class="bg-primary/60 rounded-md px-3 py-2 mb-2 text-center" style="width: max-content; max-width: 100%">
+            <div v-if="narrators?.length" class="bg-primary/60 rounded-md px-3 py-2 mb-2 text-center">
               <p class="text-fg-muted text-xs uppercase tracking-wide">{{ $strings.LabelNarrators }}</p>
               <p class="text-base leading-tight">
                 <template v-for="(narrator, index) in narrators">
@@ -98,7 +98,7 @@
               </p>
             </div>
 
-            <div v-if="tags.length" class="bg-primary/60 rounded-md px-3 py-2 mb-2 text-center" style="width: max-content; max-width: 100%">
+            <div v-if="tags.length" class="bg-primary/60 rounded-md px-3 py-2 mb-2 text-center">
               <p class="text-fg-muted text-xs uppercase tracking-wide">{{ $strings.LabelTags }}</p>
               <p class="text-sm leading-tight">
                 <template v-for="(tag, index) in tags">
@@ -471,7 +471,7 @@ export default {
     coverWidth() {
       // Left column of the item page: page padding (px-4 both sides) then 5/12 of what's left, less the gutter
       const contentWidth = Math.max(this.windowWidth - 34, 0)
-      let width = Math.floor((contentWidth * 5) / 12) - 13
+      let width = Math.floor(contentWidth / 2) - 9
       if (width < 100) width = 100
       else if (width > 260) width = 260
       return width

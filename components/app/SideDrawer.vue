@@ -14,21 +14,21 @@
         <widgets-connection-indicator />
       </div>
 
-      <div class="w-full overflow-y-auto">
+      <div class="w-full overflow-y-auto pb-28">
         <template v-for="item in navItems">
-          <button v-if="item.action" :key="item.text" :tabindex="show ? 0 : -1" class="w-full hover:bg-bg/60 flex items-center py-3 px-6 text-fg-muted" @click="clickAction(item.action)">
+          <button v-if="item.action" :key="item.text" :tabindex="show ? 0 : -1" class="w-full hover:bg-bg/60 flex items-center py-2 px-6 text-fg-muted" @click="clickAction(item.action)">
             <span class="material-symbols fill text-lg">{{ item.icon }}</span>
             <p class="pl-4">{{ item.text }}</p>
           </button>
-          <nuxt-link v-else :to="item.to" :key="item.text" :tabindex="show ? 0 : -1" class="w-full hover:bg-bg/60 flex items-center py-3 px-6 text-fg" :class="currentRoutePath.startsWith(item.to) ? 'bg-bg-hover/50' : 'text-fg-muted'">
+          <nuxt-link v-else :to="item.to" :key="item.text" :tabindex="show ? 0 : -1" class="w-full hover:bg-bg/60 flex items-center py-2 px-6 text-fg" :class="currentRoutePath.startsWith(item.to) ? 'bg-bg-hover/50' : 'text-fg-muted'">
             <span class="material-symbols fill text-lg">{{ item.icon }}</span>
             <p class="pl-4">{{ item.text }}</p>
           </nuxt-link>
         </template>
       </div>
       <div class="absolute bottom-0 left-0 w-full py-6 px-6 text-fg">
-        <div v-if="serverConnectionConfig" class="mb-4 flex justify-center">
-          <p class="text-xs text-fg-muted" style="word-break: break-word">{{ serverConnectionConfig.address }} (v{{ serverSettings.version }})</p>
+        <div v-if="serverConnectionConfig" class="mb-3 w-full">
+          <p class="text-xs text-fg-muted truncate text-center" :title="serverConnectionConfig.address">{{ serverConnectionConfig.address }} (v{{ serverSettings.version }})</p>
         </div>
         <div class="flex items-center">
           <p class="text-xs">{{ $config.version }}</p>
@@ -139,11 +139,6 @@ export default {
           icon: 'equalizer',
           text: this.$strings.ButtonUserStats,
           to: '/stats'
-        })
-        items.push({
-          icon: 'cloud_off',
-          text: this.$strings.ButtonDisconnect,
-          action: 'logout'
         })
       }
 
