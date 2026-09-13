@@ -45,7 +45,7 @@
 
         <!-- cover + stats -->
         <div class="flex items-start">
-          <div class="w-1/2 flex-shrink-0 pr-2">
+          <div ref="coverColumn" class="flex-shrink-0 pr-3" :style="{ width: coverWidth + 'px' }">
             <div class="relative rounded-md overflow-hidden" @click="showFullscreenCover = true">
               <covers-book-cover :library-item="libraryItem" :width="coverWidth" :book-cover-aspect-ratio="bookCoverAspectRatio" raw @imageLoaded="coverImageLoaded" />
               <div v-if="!isPodcast && progressPercent > 0" class="absolute bottom-0 left-0 h-1 z-10 box-shadow-progressbar" :class="userIsFinished ? 'bg-success' : 'bg-yellow-400'" :style="{ width: progressPercent * 100 + '%' }" />
@@ -75,7 +75,7 @@
           </div>
 
           <!-- stat cards -->
-          <div class="w-1/2 flex-shrink-0 pl-2">
+          <div class="flex-grow min-w-0">
             <div v-if="!isPodcast && progressPercent > 0" class="bg-primary/60 rounded-md px-3 py-2 mb-2 text-center">
               <p class="text-fg-muted text-xs uppercase tracking-wide">{{ $strings.LabelYourProgress }}</p>
               <p class="text-lg font-semibold leading-tight">{{ Math.round(progressPercent * 100) }}%</p>
@@ -212,6 +212,8 @@ export default {
       coverRgb: null,
       coverBgIsLight: false,
       windowWidth: 0,
+      windowHeight: 0,
+      coverSpace: 0,
       descriptionClamped: false,
       showFullDescription: false,
       episodeStartingPlayback: null,
@@ -472,10 +474,10 @@ export default {
       // Left column of the item page: page padding (px-4 both sides) then 5/12 of what's left, less the gutter
       const contentWidth = Math.max(this.windowWidth - 34, 0)
       let width = Math.floor(contentWidth / 2) - 9
-      // Bound by height too, so the cover plus its action buttons stay above the
-      // fold on short-but-wide screens (foldable inner display in landscape)
-      const heightBound = Math.floor(this.windowHeight * 0.45)
-      if (width > heightBound) width = heightBound
+      // Bound by the space actually left below the title block, measured in
+      // measureCoverSpace, so the play button stays above the fold whatever the
+      // title wraps to
+      if (this.coverSpace > 120 && width > this.coverSpace) width = this.coverSpace
       if (width < 100) width = 100
       else if (width > 420) width = 420
       return width
@@ -711,7 +713,23 @@ export default {
     },
     windowResized() {
       this.windowWidth = window.innerWidth
+      this.windowHeight = window.innerHeight
+      this.measureCoverSpace()
       this.checkDescriptionClamped()
+    },
+    measureCoverSpace() {
+      this.$nextTick(() => {
+        const col = this.$refs.coverColumn
+        const page = document.getElementById('item-page')
+        if (!col || !page) return
+        // Offset of the cover column within the scrolling page, independent of scroll position
+        const offsetWithinPage = col.getBoundingClientRect().top - page.getBoundingClientRect().top + page.scrollTop
+        // Room the action buttons need underneath: one row when they sit beside
+        // the play button on wide screens, two when stacked
+        const actionsReserve = this.windowWidth >= 500 ? 72 : 124
+        const pageTop = page.getBoundingClientRect().top
+        this.coverSpace = Math.floor(this.windowHeight - pageTop - offsetWithinPage - actionsReserve)
+      })
     },
     rssFeedOpen(data) {
       if (data.entityId === this.serverLibraryItemId) {
@@ -737,6 +755,8 @@ export default {
       }
 
       this.windowWidth = window.innerWidth
+      this.windowHeight = window.innerHeight
+      this.measureCoverSpace()
       window.addEventListener('resize', this.windowResized)
       this.$eventBus.$on('library-changed', this.libraryChanged)
       this.$eventBus.$on('new-local-library-item', this.newLocalLibraryItem)
@@ -812,6 +832,7 @@ export default {
   }
   .item-actions .item-actions-icons {
     margin-top: 0;
+    margin-left: 0.5rem;
     flex-shrink: 0;
   }
 }
