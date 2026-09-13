@@ -56,6 +56,11 @@ class MainActivity : BridgeActivity() {
     // Update the margins to handle edge-to-edge enforced in SDK 35
     // See: https://developer.android.com/develop/ui/views/layout/edge-to-edge
     val webView: WebView = findViewById(R.id.webview)
+
+    // Ignore the OS font-size setting. Material Symbols icons are a font, so the
+    // system multiplier grew every icon while fixed-size boxes stayed put, which
+    // pulled layouts apart. The app sets its own baseline in assets/app.css.
+    webView.settings.textZoom = 100
     webView.setOnApplyWindowInsetsListener { v, insets ->
       val (left, top, right, bottom) = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
         val sysInsets = insets.getInsets(WindowInsets.Type.systemBars())

@@ -6,6 +6,14 @@
         <p v-if="user" class="text-base" v-html="$getString('HeaderWelcome', [username])" />
       </div>
 
+      <div v-if="user && currentLibrary" class="px-6 mb-4 flex items-center">
+        <button type="button" aria-label="Show library modal" class="flex-grow pl-1.5 pr-2.5 py-2 bg-bg-hover bg-opacity-50 rounded-md flex items-center" @click="clickShowLibraryModal">
+          <ui-library-icon :icon="currentLibraryIcon" :size="4" font-size="base" />
+          <p class="text-sm leading-4 ml-2 mt-0.5 truncate">{{ currentLibraryName }}</p>
+        </button>
+        <widgets-connection-indicator />
+      </div>
+
       <div class="w-full overflow-y-auto">
         <template v-for="item in navItems">
           <button v-if="item.action" :key="item.text" :tabindex="show ? 0 : -1" class="w-full hover:bg-bg/60 flex items-center py-3 px-6 text-fg-muted" @click="clickAction(item.action)">
@@ -58,6 +66,15 @@ export default {
     }
   },
   computed: {
+    currentLibrary() {
+      return this.$store.getters['libraries/getCurrentLibrary']
+    },
+    currentLibraryName() {
+      return this.currentLibrary?.name || ''
+    },
+    currentLibraryIcon() {
+      return this.currentLibrary?.icon || 'database'
+    },
     show: {
       get() {
         return this.$store.state.showSideDrawer
@@ -159,6 +176,9 @@ export default {
     }
   },
   methods: {
+    clickShowLibraryModal() {
+      this.$store.commit('libraries/setShowModal', true)
+    },
     async clickAction(action) {
       await this.$hapticsImpact()
       if (action === 'logout') {

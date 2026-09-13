@@ -8,21 +8,21 @@
 
       <!-- Collapse button - minimizes player -->
       <div class="top-4 left-4 absolute cursor-pointer">
-        <span class="material-symbols text-5xl" :class="{ 'text-black text-opacity-75': coverBgIsLight && theme !== 'black' }" @click="collapseFullscreen">keyboard_arrow_down</span>
+        <span class="material-symbols player-top-icon-lg text-5xl" :class="{ 'text-black text-opacity-75': coverBgIsLight && theme !== 'black' }" @click="collapseFullscreen">keyboard_arrow_down</span>
       </div>
 
       <!-- Cast button - Chromecast toggle -->
-      <div v-show="showCastBtn" class="top-6 right-16 absolute cursor-pointer">
-        <span class="material-symbols text-3xl" :class="coverBgIsLight && theme !== 'black' ? 'text-black' : ''" @click="castClick">{{ isCasting ? 'cast_connected' : 'cast' }}</span>
+      <div v-show="showCastBtn" class="player-top-right top-6 right-16 absolute cursor-pointer">
+        <span class="material-symbols player-top-icon text-3xl" :class="coverBgIsLight && theme !== 'black' ? 'text-black' : ''" @click="castClick">{{ isCasting ? 'cast_connected' : 'cast' }}</span>
       </div>
 
       <!-- Player options menu button -->
-      <div class="top-6 right-4 absolute cursor-pointer">
-        <span class="material-symbols text-3xl" :class="{ 'text-black text-opacity-75': coverBgIsLight && theme !== 'black' }" @click="showMoreMenuDialog = true">more_vert</span>
+      <div class="player-top-right top-6 right-4 absolute cursor-pointer">
+        <span class="material-symbols player-top-icon text-3xl" :class="{ 'text-black text-opacity-75': coverBgIsLight && theme !== 'black' }" @click="showMoreMenuDialog = true">more_vert</span>
       </div>
 
       <!-- Playback method indicator (Direct/Local/Transcode) -->
-      <p class="top-4 absolute left-0 right-0 mx-auto text-center uppercase tracking-widest text-opacity-75 z-50" :class="{ 'text-black text-opacity-75': coverBgIsLight && theme !== 'black' }" style="font-size: 10px">{{ isDirectPlayMethod ? $strings.LabelPlaybackDirect : isLocalPlayMethod ? $strings.LabelPlaybackLocal : $strings.LabelPlaybackTranscode }}</p>
+      <p class="player-playmethod-label top-4 absolute left-0 right-0 mx-auto text-center uppercase tracking-widest text-opacity-75 z-50" :class="{ 'text-black text-opacity-75': coverBgIsLight && theme !== 'black' }" style="font-size: 10px">{{ isDirectPlayMethod ? $strings.LabelPlaybackDirect : isLocalPlayMethod ? $strings.LabelPlaybackLocal : $strings.LabelPlaybackTranscode }}</p>
     </div>
 
     <!-- Overall book progress bar -->
@@ -63,7 +63,7 @@
 
     <div id="playerContent" class="playerContainer w-full z-20 absolute bottom-0 left-0 right-0 p-2 pointer-events-auto transition-all" :style="{ backgroundColor: showFullscreen ? '' : coverRgb }" @click="clickContainer">
       <!-- Top controls bar - fullscreen only: bookmarks, speed, sleep timer, chapters -->
-      <div v-if="showFullscreen" class="absolute bottom-4 left-0 right-0 w-full pb-4 pt-2 mx-auto px-6" style="max-width: 414px">
+      <div v-if="showFullscreen" class="player-options-row absolute bottom-4 left-0 right-0 w-full pb-4 pt-2 mx-auto px-6" style="max-width: 414px">
         <div class="flex items-center justify-between pointer-events-auto">
           <span v-if="!isPodcast && serverLibraryItemId && socketConnected" class="material-symbols text-3xl text-fg-muted cursor-pointer" :class="{ fill: bookmarks.length }" @click="$emit('showBookmarks')">bookmark</span>
           <!-- hidden for podcasts but still using this as a placeholder -->
@@ -274,13 +274,17 @@ export default {
         let sideSpace = 20
         if (this.bookCoverAspectRatio === 1.6) sideSpace += (this.windowWidth - sideSpace) * 0.375
 
-        const availableHeight = this.windowHeight - 400
+        // Mirrors --player-h in the stylesheet: the control block scales with screen height
+        const playerHeight = Math.min(250, Math.max(190, this.windowHeight * 0.34))
+        // plus the chapter line (58) and clearance for the top bar icons (84)
+        const availableHeight = this.windowHeight - playerHeight - 142
         let width = this.windowWidth - sideSpace
         const totalHeight = width * this.bookCoverAspectRatio
         if (totalHeight > availableHeight) {
           width = availableHeight / this.bookCoverAspectRatio
         }
-        return width
+        // Cap on large screens (foldable inner display, tablets)
+        return Math.min(width, 420)
       } else {
         // Landscape
         const heightScale = (this.windowHeight - 200) / 651
@@ -334,7 +338,7 @@ export default {
     title() {
       const mediaItemTitle = this.playbackSession?.displayTitle || this.mediaMetadata?.title || 'Title'
       if (this.currentChapterTitle) {
-        if (this.showFullscreen) return this.currentChapterTitle
+        if (this.showFullscreen) return `Chapter: ${this.currentChapterTitle}`
         return `${mediaItemTitle} | ${this.currentChapterTitle}`
       }
       return mediaItemTitle
@@ -1235,5 +1239,152 @@ export default {
 }
 .fullscreen #playerControls .play-btn .material-symbols {
   font-size: 2.1rem;
+}
+/* ===== Foldable / small-screen player layout =====
+   Portrait only. Landscape and the collapsed mini-player are untouched. */
+@media (orientation: portrait) {
+  .fullscreen {
+    /* Bottom control block scales with the screen instead of a flat 200px */
+    --player-h: clamp(190px, 34vh, 250px);
+    --title-block-height: 58px;
+  }
+
+  .fullscreen .playerContainer {
+    height: var(--player-h);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding-top: 0;
+    padding-bottom: 14px;
+  }
+
+  /* The three rows leave the absolute layer and become flex children,
+     reordered because DOM order is options / controls / track */
+  .fullscreen #playerTrack,
+  .fullscreen #playerControls,
+  .fullscreen .player-options-row {
+    position: static;
+    top: auto;
+    bottom: auto;
+    left: auto;
+    right: auto;
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .fullscreen #playerTrack {
+    order: 1;
+    max-width: 100%;
+    padding-top: 0;
+    padding-bottom: 24px;
+  }
+  /* Breathing room between the timestamps and the scrub bar itself */
+  .fullscreen #playerTrack > .flex {
+    margin-bottom: 12px;
+  }
+  .fullscreen #playerControls {
+    order: 2;
+    max-width: 380px;
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+  .fullscreen .player-options-row {
+    order: 3;
+    max-width: 380px;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+
+  /* Cover and title stack above the control block, with clearance at the top
+     so the artwork can never reach the cast / overflow buttons */
+  .fullscreen .cover-wrapper {
+    bottom: calc(var(--player-h) + var(--title-block-height));
+  }
+  .fullscreen .title-author-texts {
+    bottom: calc(var(--player-h) + 8px);
+    padding-bottom: 0;
+  }
+  .fullscreen .total-track {
+    bottom: calc(var(--player-h) + 15px);
+  }
+
+  /* Chapter line: single line, smaller, author dropped */
+  .fullscreen .title-author-texts .author-text {
+    display: none;
+  }
+  .fullscreen .title-author-texts .title-text {
+    font-size: 1rem;
+    line-height: 1.4;
+  }
+
+  /* Top bar: collapse / cast / overflow / play-method label all share one
+     1.5rem line box anchored at the same offset, so they sit on one line */
+  .fullscreen .player-top-icon-lg {
+    font-size: 1.5rem;
+    line-height: 1.5rem;
+  }
+  .fullscreen .player-top-icon {
+    font-size: 1.15rem;
+    line-height: 1.5rem;
+  }
+  .fullscreen .player-top-right {
+    top: 16px;
+  }
+  .fullscreen .player-playmethod-label {
+    top: 16px;
+    line-height: 1.5rem;
+  }
+
+  /* Transport controls trimmed a notch */
+  .fullscreen #playerControls .jump-icon {
+    font-size: 2.05rem;
+  }
+  .fullscreen #playerControls .next-icon {
+    font-size: 1.7rem;
+  }
+  .fullscreen #playerControls .play-btn {
+    height: 58px;
+    width: 58px;
+    min-width: 58px;
+    min-height: 58px;
+  }
+  .fullscreen #playerControls .play-btn .material-symbols {
+    font-size: 1.9rem;
+  }
+
+  /* Options row a notch smaller again */
+  .fullscreen .player-options-row .material-symbols {
+    font-size: 1.5rem;
+  }
+  .fullscreen .player-options-row svg {
+    font-size: 1.5rem;
+    height: 1em;
+    width: 1em;
+  }
+  .fullscreen .player-options-row .font-mono {
+    font-size: 1.2rem;
+  }
+}
+
+/* ===== Collapsed mini-player =====
+   Geometry only - text sizes come from the app-wide baseline in app.css. */
+
+/* Mini-player content sat high in its bar once the text was pinned smaller,
+   leaving dead space above the gesture bar. Shift the whole group down and
+   bring the bar's top edge down to match. */
+#streamContainer:not(.fullscreen) .playerContainer {
+  height: 102px;
+}
+#streamContainer:not(.fullscreen) #playerTrack {
+  bottom: 13px;
+}
+#streamContainer:not(.fullscreen) #playerControls {
+  bottom: 48px;
+}
+#streamContainer:not(.fullscreen) .cover-wrapper {
+  bottom: 46px;
+}
+#streamContainer:not(.fullscreen) .title-author-texts {
+  bottom: 54px;
 }
 </style>
