@@ -51,12 +51,12 @@
               <div v-if="!isPodcast && progressPercent > 0" class="absolute bottom-0 left-0 h-1 z-10 box-shadow-progressbar" :class="userIsFinished ? 'bg-success' : 'bg-yellow-400'" :style="{ width: progressPercent * 100 + '%' }" />
             </div>
 
-            <div v-if="showPlay || showRead" class="mt-2">
-              <ui-btn v-if="showPlay" color="success" class="flex items-center justify-center w-full" :loading="playerIsStartingForThisMedia" :padding-x="2" @click="playClick">
+            <div v-if="showPlay || showRead" class="mt-2 item-actions">
+              <ui-btn v-if="showPlay" color="success" class="item-actions-main flex items-center justify-center w-full" :loading="playerIsStartingForThisMedia" :padding-x="2" @click="playClick">
                 <span class="material-symbols text-xl fill">{{ playerIsPlaying ? 'pause' : 'play_arrow' }}</span>
                 <span class="px-1 text-base">{{ playerIsPlaying ? $strings.ButtonPause : isPodcast ? $strings.ButtonNextEpisode : hasLocal ? $strings.ButtonPlay : $strings.ButtonStream }}</span>
               </ui-btn>
-              <div class="flex mt-2 -mx-1">
+              <div class="item-actions-icons flex mt-2 -mx-1">
                 <ui-btn v-if="showRead" color="info" class="flex items-center justify-center flex-grow mx-1" :padding-x="2" @click="readBook">
                   <span class="material-symbols text-xl">auto_stories</span>
                 </ui-btn>
@@ -473,7 +473,7 @@ export default {
       const contentWidth = Math.max(this.windowWidth - 34, 0)
       let width = Math.floor(contentWidth / 2) - 9
       if (width < 100) width = 100
-      else if (width > 260) width = 260
+      else if (width > 420) width = 420
       return width
     },
     coverHeight() {
@@ -796,6 +796,22 @@ export default {
 </script>
 
 <style>
+/* Wide screens (foldable inner display): the action icons sit beside Stream.
+   Narrow screens keep them stacked underneath. */
+@media (min-width: 500px) {
+  .item-actions {
+    display: flex;
+    align-items: center;
+  }
+  .item-actions .item-actions-main {
+    flex-grow: 1;
+  }
+  .item-actions .item-actions-icons {
+    margin-top: 0;
+    flex-shrink: 0;
+  }
+}
+
 :root {
   --item-page-bg-gradient-height: 100%;
 }
