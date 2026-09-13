@@ -57,13 +57,16 @@
                 <span class="px-1 text-base">{{ playerIsPlaying ? $strings.ButtonPause : isPodcast ? $strings.ButtonNextEpisode : hasLocal ? $strings.ButtonPlay : $strings.ButtonStream }}</span>
               </ui-btn>
               <div class="item-actions-icons flex mt-2 -mx-1">
-                <ui-btn v-if="showRead" color="info" class="flex items-center justify-center flex-grow mx-1" :padding-x="2" @click="readBook">
+                <ui-btn v-if="showRead" color="info" class="flex items-center justify-center mx-1" :padding-x="2" @click="readBook">
                   <span class="material-symbols text-xl">auto_stories</span>
                 </ui-btn>
-                <ui-btn v-if="showDownload" :color="downloadItem ? 'warning' : 'primary'" class="flex items-center justify-center flex-grow mx-1" :padding-x="2" @click="downloadClick">
+                <ui-btn v-if="showDownload" :color="downloadItem ? 'warning' : 'primary'" class="flex items-center justify-center mx-1" :padding-x="2" @click="downloadClick">
                   <span class="material-symbols text-xl" :class="downloadItem || startingDownload ? 'animate-pulse' : ''">{{ downloadItem || startingDownload ? 'downloading' : 'download' }}</span>
                 </ui-btn>
-                <ui-btn color="primary" class="flex items-center justify-center flex-grow mx-1" :padding-x="2" @click="moreButtonPress">
+                <ui-btn v-else-if="showDeleteLocal" color="error" class="flex items-center justify-center mx-1" :padding-x="2" @click="deleteLocalClick">
+                  <span class="material-symbols text-xl">delete</span>
+                </ui-btn>
+                <ui-btn color="primary" class="flex items-center justify-center mx-1" :padding-x="2" @click="moreButtonPress">
                   <span class="material-symbols text-xl">more_vert</span>
                 </ui-btn>
               </div>
@@ -151,7 +154,7 @@
     </div>
 
     <!-- modals -->
-    <modals-item-more-menu-modal v-model="showMoreMenu" :library-item="libraryItem" :rss-feed="rssFeed" :processing.sync="processing" />
+    <modals-item-more-menu-modal ref="moreMenu" v-model="showMoreMenu" :library-item="libraryItem" :rss-feed="rssFeed" :processing.sync="processing" />
 
     <modals-select-local-folder-modal v-model="showSelectLocalFolder" :media-type="mediaType" @select="selectedLocalFolder" />
 
@@ -444,6 +447,10 @@ export default {
     showRead() {
       return this.ebookFile
     },
+    showDeleteLocal() {
+      // Mirrors the more-menu's own condition for offering Delete Local Item
+      return !!this.localLibraryItemId && !this.isPodcast
+    },
     showDownload() {
       if (this.isPodcast || this.hasLocal) return false
       return this.user && this.userCanDownload && (this.showPlay || this.showRead)
@@ -710,6 +717,11 @@ export default {
       } else {
         this.descriptionClamped = this.$refs.description.scrollHeight > this.$refs.description.clientHeight
       }
+    },
+    deleteLocalClick() {
+      // Reuse the more-menu modal's delete, which handles the confirm dialog and
+      // the redirect back to the server item, rather than duplicating it here
+      if (this.$refs.moreMenu?.deleteLocalItem) this.$refs.moreMenu.deleteLocalItem()
     },
     windowResized() {
       this.windowWidth = window.innerWidth

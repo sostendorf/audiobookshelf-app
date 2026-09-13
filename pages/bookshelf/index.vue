@@ -9,7 +9,7 @@
       <p class="pl-4">{{ $strings.MessageLoadingServerData }}</p>
     </div>
 
-    <div class="w-full" :class="{ 'py-6': altViewEnabled }">
+    <div class="w-full" :class="{ 'pt-1 pb-6': altViewEnabled }">
       <template v-for="(shelf, index) in shelves">
         <bookshelf-shelf :key="shelf.id" :label="getShelfLabel(shelf)" :entities="shelf.entities" :type="shelf.type" :style="{ zIndex: shelves.length - index }" />
       </template>
