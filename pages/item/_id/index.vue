@@ -472,6 +472,10 @@ export default {
       // Left column of the item page: page padding (px-4 both sides) then 5/12 of what's left, less the gutter
       const contentWidth = Math.max(this.windowWidth - 34, 0)
       let width = Math.floor(contentWidth / 2) - 9
+      // Bound by height too, so the cover plus its action buttons stay above the
+      // fold on short-but-wide screens (foldable inner display in landscape)
+      const heightBound = Math.floor(this.windowHeight * 0.45)
+      if (width > heightBound) width = heightBound
       if (width < 100) width = 100
       else if (width > 420) width = 420
       return width

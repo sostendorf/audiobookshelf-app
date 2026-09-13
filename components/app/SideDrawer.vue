@@ -142,19 +142,18 @@ export default {
         })
       }
 
+      items.push({
+        icon: 'download',
+        iconOutlined: false,
+        text: this.$strings.HeaderDownloads,
+        to: '/downloads'
+      })
       if (this.$platform !== 'ios') {
         items.push({
           icon: 'folder',
           iconOutlined: true,
           text: this.$strings.ButtonLocalMedia,
           to: '/localMedia/folders'
-        })
-      } else {
-        items.push({
-          icon: 'download',
-          iconOutlined: false,
-          text: this.$strings.HeaderDownloads,
-          to: '/downloads'
         })
       }
       items.push({

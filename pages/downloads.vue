@@ -5,7 +5,7 @@
     <div class="w-full">
       <template v-for="(mediaItem, num) in localLibraryItems">
         <div :key="mediaItem.id" class="w-full">
-          <nuxt-link :to="`/localMedia/item/${mediaItem.id}`" class="flex items-center">
+          <nuxt-link :to="`/item/${mediaItem.id}`" class="flex items-center">
             <div class="w-16 h-16 min-w-16 min-h-16 flex-none bg-primary relative">
               <img v-if="mediaItem.coverPathSrc" :src="mediaItem.coverPathSrc" class="w-full h-full object-contain" />
             </div>

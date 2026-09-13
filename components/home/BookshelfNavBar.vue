@@ -81,9 +81,9 @@ export default {
           {
             to: '/bookshelf/library',
             routeName: 'bookshelf-library',
-            iconPack: 'abs-icons',
-            icon: this.currentLibraryIcon,
-            iconClass: 'text-lg',
+            iconPack: 'material-symbols',
+            icon: 'library_books',
+            iconClass: 'text-xl',
             text: this.$strings.ButtonLibrary
           },
           {
