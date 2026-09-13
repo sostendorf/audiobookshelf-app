@@ -52,9 +52,9 @@
             </div>
 
             <div v-if="showPlay || showRead" class="mt-2 item-actions">
-              <ui-btn v-if="showPlay" color="success" class="item-actions-main flex items-center justify-center w-full" :loading="playerIsStartingForThisMedia" :padding-x="2" @click="playClick">
+              <ui-btn v-if="showPlay" :color="hasLocal || isPodcast ? 'success' : 'info'" class="item-actions-main flex items-center justify-center w-full" :loading="playerIsStartingForThisMedia" :padding-x="2" @click="playClick">
                 <span class="material-symbols text-xl fill">{{ playerIsPlaying ? 'pause' : 'play_arrow' }}</span>
-                <span class="px-1 text-base">{{ playerIsPlaying ? $strings.ButtonPause : isPodcast ? $strings.ButtonNextEpisode : hasLocal ? $strings.ButtonPlay : $strings.ButtonStream }}</span>
+                <span class="item-actions-label px-1 text-base">{{ playerIsPlaying ? $strings.ButtonPause : isPodcast ? $strings.ButtonNextEpisode : hasLocal ? $strings.ButtonPlay : $strings.ButtonStream }}</span>
               </ui-btn>
               <div class="item-actions-icons flex mt-2 -mx-1">
                 <ui-btn v-if="showRead" color="info" class="flex items-center justify-center mx-1" :padding-x="2" @click="readBook">
@@ -736,9 +736,8 @@ export default {
         if (!col || !page) return
         // Offset of the cover column within the scrolling page, independent of scroll position
         const offsetWithinPage = col.getBoundingClientRect().top - page.getBoundingClientRect().top + page.scrollTop
-        // Room the action buttons need underneath: one row when they sit beside
-        // the play button on wide screens, two when stacked
-        const actionsReserve = this.windowWidth >= 500 ? 72 : 124
+        // Room the action buttons need underneath: always a single row now
+        const actionsReserve = 72
         const pageTop = page.getBoundingClientRect().top
         this.coverSpace = Math.floor(this.windowHeight - pageTop - offsetWithinPage - actionsReserve)
       })
@@ -832,20 +831,28 @@ export default {
 </script>
 
 <style>
-/* Wide screens (foldable inner display): the action icons sit beside Stream.
-   Narrow screens keep them stacked underneath. */
-@media (min-width: 500px) {
-  .item-actions {
-    display: flex;
-    align-items: center;
-  }
-  .item-actions .item-actions-main {
-    flex-grow: 1;
-  }
-  .item-actions .item-actions-icons {
-    margin-top: 0;
-    margin-left: 0.5rem;
-    flex-shrink: 0;
+/* Play button and the icon buttons share one row on every screen. The play
+   button shrinks to make room rather than wrapping the icons underneath. */
+.item-actions {
+  display: flex;
+  align-items: center;
+}
+.item-actions .item-actions-main {
+  flex-grow: 1;
+  min-width: 0;
+}
+.item-actions .item-actions-icons {
+  margin-top: 0;
+  margin-left: 0.5rem;
+  flex-shrink: 0;
+}
+
+/* Narrow screens (cover display): the label has no room beside the icon
+   buttons, so the play button goes icon-only. The icon distinguishes the
+   states on its own - stream, play or pause. */
+@media (max-width: 500px) {
+  .item-actions .item-actions-label {
+    display: none;
   }
 }
 
