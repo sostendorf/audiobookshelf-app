@@ -75,20 +75,20 @@
           </div>
 
           <!-- stat cards -->
-          <div class="flex-grow">
-            <div v-if="!isPodcast && progressPercent > 0" class="bg-primary/60 rounded-md px-3 py-2 mb-2 text-center">
+          <div class="flex-grow flex flex-col items-center">
+            <div v-if="!isPodcast && progressPercent > 0" class="bg-primary/60 rounded-md px-3 py-2 mb-2 text-center" style="width: max-content; max-width: 100%">
               <p class="text-fg-muted text-xs uppercase tracking-wide">{{ $strings.LabelYourProgress }}</p>
               <p class="text-lg font-semibold leading-tight">{{ Math.round(progressPercent * 100) }}%</p>
               <p v-if="!useEBookProgress && !userIsFinished" class="text-fg-muted text-xs">{{ $getString('LabelTimeRemaining', [$elapsedPretty(userTimeRemaining)]) }}</p>
               <p v-else-if="userIsFinished" class="text-fg-muted text-xs">{{ $strings.LabelFinished }} {{ $formatDate(userProgressFinishedAt) }}</p>
             </div>
 
-            <div v-if="numTracks" class="bg-primary/60 rounded-md px-3 py-2 mb-2 text-center">
+            <div v-if="numTracks" class="bg-primary/60 rounded-md px-3 py-2 mb-2 text-center" style="width: max-content; max-width: 100%">
               <p class="text-fg-muted text-xs uppercase tracking-wide">{{ $strings.LabelDuration }}</p>
               <p class="text-base font-semibold leading-tight">{{ $elapsedPretty(duration) }}</p>
             </div>
 
-            <div v-if="narrators?.length" class="bg-primary/60 rounded-md px-3 py-2 mb-2 text-center">
+            <div v-if="narrators?.length" class="bg-primary/60 rounded-md px-3 py-2 mb-2 text-center" style="width: max-content; max-width: 100%">
               <p class="text-fg-muted text-xs uppercase tracking-wide">{{ $strings.LabelNarrators }}</p>
               <p class="text-base leading-tight">
                 <template v-for="(narrator, index) in narrators">
@@ -98,7 +98,7 @@
               </p>
             </div>
 
-            <div v-if="tags.length" class="bg-primary/60 rounded-md px-3 py-2 mb-2 text-center">
+            <div v-if="tags.length" class="bg-primary/60 rounded-md px-3 py-2 mb-2 text-center" style="width: max-content; max-width: 100%">
               <p class="text-fg-muted text-xs uppercase tracking-wide">{{ $strings.LabelTags }}</p>
               <p class="text-sm leading-tight">
                 <template v-for="(tag, index) in tags">

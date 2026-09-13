@@ -33,9 +33,9 @@
         <div class="flex items-center">
           <p class="text-xs">{{ $config.version }}</p>
           <div class="flex-grow" />
-          <div v-if="user" class="flex items-center" @click="disconnect">
-            <p class="text-xs pr-2">{{ $strings.ButtonDisconnect }}</p>
-            <i class="material-symbols text-sm -mb-0.5">cloud_off</i>
+          <div v-if="user" class="flex items-center" :class="connectionStatus.class">
+            <p class="text-xs pr-2">{{ connectionStatus.text }}</p>
+            <i class="material-symbols text-sm -mb-0.5">{{ connectionStatus.icon }}</i>
           </div>
         </div>
       </div>
@@ -66,6 +66,21 @@ export default {
     }
   },
   computed: {
+    socketConnected() {
+      return this.$store.state.socketConnected
+    },
+    networkConnected() {
+      return this.$store.state.networkConnected
+    },
+    attemptingConnection() {
+      return this.$store.state.attemptingConnection
+    },
+    connectionStatus() {
+      if (this.attemptingConnection) return { icon: 'cloud_sync', text: 'Connecting', class: 'text-warning' }
+      if (!this.networkConnected) return { icon: 'wifi_off', text: 'No network', class: 'text-error' }
+      if (!this.socketConnected) return { icon: 'cloud_off', text: 'Server offline', class: 'text-warning' }
+      return { icon: 'cloud_done', text: 'Connected', class: 'text-success' }
+    },
     currentLibrary() {
       return this.$store.getters['libraries/getCurrentLibrary']
     },
@@ -124,6 +139,11 @@ export default {
           icon: 'equalizer',
           text: this.$strings.ButtonUserStats,
           to: '/stats'
+        })
+        items.push({
+          icon: 'cloud_off',
+          text: this.$strings.ButtonDisconnect,
+          action: 'logout'
         })
       }
 

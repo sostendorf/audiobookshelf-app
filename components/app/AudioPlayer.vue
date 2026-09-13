@@ -1240,6 +1240,13 @@ export default {
 .fullscreen #playerControls .play-btn .material-symbols {
   font-size: 2.1rem;
 }
+/* The play-method label (LOCAL / DIRECT / TRANSCODE) spans the full width at
+   the same offset as the collapse, cast and overflow buttons and sits above
+   them at z-50. It is a label, not a control, so taps must fall through. */
+.player-playmethod-label {
+  pointer-events: none;
+}
+
 /* ===== Foldable / small-screen player layout =====
    Portrait only. Landscape and the collapsed mini-player are untouched. */
 @media (orientation: portrait) {
