@@ -44,7 +44,16 @@ class ApiHandler(var ctx:Context) {
     }
   }
 
-  private var defaultClient = OkHttpClient()
+  // Every API call (progress sync, libraries, token refresh) goes through this
+  // client. Without an overall call timeout a request can hang indefinitely on a
+  // stalled connection - a trickling response never trips the per-read timeout.
+  private var defaultClient =
+          OkHttpClient.Builder()
+                  .connectTimeout(10, TimeUnit.SECONDS)
+                  .readTimeout(20, TimeUnit.SECONDS)
+                  .writeTimeout(20, TimeUnit.SECONDS)
+                  .callTimeout(30, TimeUnit.SECONDS)
+                  .build()
   private var pingClient = OkHttpClient.Builder().callTimeout(3, TimeUnit.SECONDS).build()
   private var jacksonMapper = jacksonObjectMapper().enable(JsonReadFeature.ALLOW_UNESCAPED_CONTROL_CHARS.mappedFeature())
   private var secureStorage = SecureStorage(ctx)
